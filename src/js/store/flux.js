@@ -1,43 +1,58 @@
+import { useParams } from "react-router-dom";
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+			people: [],
+			planets: [],
+			favorites: [],
+			
+		
 		},
+
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
-			},
-			changeColor: (index, color) => {
-				//get the store
+			
+			displayPeople: () => {
+				
+				fetch("https://swapi.tech/api/people/")
+					.then(res => res.json())
+					.then((data) => {
+						console.log(data)
+						setStore({people: data.results})
+					});
+					},
+
+			displayPlanets: () => {
+						
+				fetch("https://swapi.tech/api/planets/")
+					.then(res => res.json())
+					.then((data) => {
+						setStore({planets: data.results})
+					});
+					},
+
+			displayFavorites: (name) => {
 				const store = getStore();
+				if(store.favorites.includes(name)){
+					setStore({favorites: store.favorites.filter((item) => item != name)})
+					// setStore({favorites: ["prueba"]}),
+					// console.log(store.favorites)
+				}
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+				else {
+					setStore({favorites: [...store.favorites, name]})
+					// console.log(store.favorites)
+				}
+			},
 
-				//reset the global store
-				setStore({ demo: demo });
+			
+
+			deleteFavorites: (name) => {
+				const store = getStore();
+				console.log(name)
+				setStore({favorites: store.favorites.filter((item) => item != name)})
 			}
+
 		}
 	};
 };
